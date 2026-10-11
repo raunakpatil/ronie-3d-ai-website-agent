@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ronie — a 3D AI agent for websites</title>
+  <meta name="description" content="Ronie is an embodied AI guide that lives on a website: he talks in a natural on-device voice, answers questions grounded in real facts, reacts with his face and body, and plays a mind-reading game — for $0 a month.">
+  <meta property="og:title" content="Ronie — a 3D AI agent for websites">
+  <meta property="og:description" content="An embodied AI guide for websites: grounded answers, 23 expressions, 23 authored moves, an on-device neural voice, $0/month. Live at raunakpatil.com/ronie.">
+  <meta property="og:image" content="https://raunakpatil.github.io/ronie-3d-ai-website-agent/assets/social-preview.jpg">
+  <meta property="og:url" content="https://raunakpatil.github.io/ronie-3d-ai-website-agent/">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0b0c; --card: #141416; --line: #26262a; --ink: #f2f2f2; --ink-2: #9a9aa2; --ink-3: #6b6b73;
+      --orange: #ff7a1a; --lime: #c6f432; --pink: #ff9cf0; --cyan: #9cf6ff;
+      --font: "Inter Tight", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+      --r: 18px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font); font-size: 17px; line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    a { color: inherit; }
+    img, video { max-width: 100%; display: block; }
+    .wrap { width: min(1160px, calc(100% - 32px)); margin: 0 auto; }
+    .mono { font-family: var(--mono); }
+
+    /* top bar */
+    .bar { position: sticky; top: 0; z-index: 10; background: rgba(11, 11, 12, .78); backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+    .bar .wrap { display: flex; align-items: center; justify-content: space-between; height: 56px; gap: 16px; }
+    .brand { font-weight: 600; letter-spacing: .02em; text-decoration: none; }
+    .brand span { color: var(--orange); }
+    .nav { display: flex; gap: 22px; font-size: 14px; color: var(--ink-2); }
+    .nav a { text-decoration: none; white-space: nowrap; }
+    .bar .btn, .brand { flex: none; white-space: nowrap; }
+    @media (max-width: 980px) { .nav { gap: 14px; font-size: 13px; } }
+    .nav a:hover { color: var(--ink); }
+    @media (max-width: 700px) { .nav { display: none; } }
+
+    /* hero */
+    .hero { padding: 72px 0 40px; }
+    .kicker { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--lime); }
+    h1 { font-size: clamp(40px, 6.4vw, 84px); line-height: .98; letter-spacing: -.035em; font-weight: 500; margin: 14px 0 18px; }
+    h1 em { font-style: normal; color: var(--orange); }
+    .lede { font-size: clamp(17px, 1.6vw, 21px); color: var(--ink-2); max-width: 720px; margin: 0 0 30px; }
+    .ctas { display: flex; flex-wrap: wrap; gap: 12px; }
+    .btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; border-radius: 999px; font-weight: 500; text-decoration: none; font-size: 15px; border: 1px solid var(--line); }
+    .btn.primary { background: var(--orange); color: #1a0c00; border-color: var(--orange); }
+    .btn:hover { transform: translateY(-1px); }
+    .btn { transition: transform .2s; }
+    .stage { margin-top: 44px; border-radius: 22px; overflow: hidden; border: 1px solid var(--line); background: #000; box-shadow: 0 30px 80px rgba(0, 0, 0, .55); }
+    .stage video { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+    .caption { font-size: 13px; color: var(--ink-3); margin-top: 12px; text-align: center; }
+
+    /* sections */
+    section { padding: 70px 0; border-top: 1px solid var(--line); }
+    h2 { font-size: clamp(30px, 3.6vw, 46px); letter-spacing: -.025em; line-height: 1.05; font-weight: 500; margin: 10px 0 14px; }
+    .sub { color: var(--ink-2); max-width: 760px; margin: 0 0 34px; }
+
+    /* stats */
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+    .stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 20px; }
+    .stat b { display: block; font-size: 34px; font-weight: 500; letter-spacing: -.02em; }
+    .stat span { font-size: 14px; color: var(--ink-2); }
+
+    /* feature cards */
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .card { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 22px; }
+    .card h3 { font-size: 18px; font-weight: 500; margin: 12px 0 8px; }
+    .card p { margin: 0; color: var(--ink-2); font-size: 15px; }
+    .tag { display: inline-block; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+    .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 8px; vertical-align: 1px; }
+
+    /* gallery */
+    .gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+    .gallery figure { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: var(--r); overflow: hidden; }
+    .gallery img { width: 100%; aspect-ratio: 16 / 10; object-fit: cover; }
+    .gallery figcaption { padding: 14px 18px 16px; font-size: 14px; color: var(--ink-2); }
+    .gallery figcaption b { color: var(--ink); font-weight: 500; }
+    .gallery .tall { grid-row: span 2; }
+    .gallery .tall img { aspect-ratio: auto; height: calc(100% - 64px); object-fit: cover; object-position: top; }
+    @media (max-width: 760px) { .gallery { grid-template-columns: 1fr; } .gallery .tall { grid-row: auto; } .gallery .tall img { height: auto; } }
+
+    /* architecture */
+    .arch { display: grid; grid-template-columns: 1fr auto 1fr auto 1fr; align-items: stretch; gap: 10px; }
+    .node { background: var(--card); border: 1px solid var(--line); border-radius: var(--r); padding: 18px; }
+    .node h4 { margin: 0 0 10px; font-size: 13px; font-family: var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--lime); font-weight: 500; }
+    .node ul { margin: 0; padding-left: 18px; color: var(--ink-2); font-size: 14.5px; }
+    .node li { margin: 3px 0; }
+    .arrow { align-self: center; color: var(--ink-3); font-family: var(--mono); font-size: 13px; text-align: center; }
+    @media (max-width: 900px) { .arch { grid-template-columns: 1fr; } .arrow { transform: rotate(90deg); padding: 4px 0; } }
+
+    /* message flow */
+    .flow { counter-reset: s; display: grid; gap: 10px; }
+    .flow li { list-style: none; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 14px 18px 14px 56px; position: relative; color: var(--ink-2); }
+    .flow li::before { counter-increment: s; content: counter(s, decimal-leading-zero); position: absolute; left: 18px; top: 14px; font-family: var(--mono); font-size: 13px; color: var(--orange); }
+    .flow li b { color: var(--ink); font-weight: 500; }
+    .flow code, .deep code { font-family: var(--mono); font-size: .86em; background: #1d1d21; border: 1px solid var(--line); border-radius: 6px; padding: 1px 6px; color: var(--ink); }
+
+    /* deep dives */
+    .deep { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 12px; }
+    .deep .card ul { margin: 10px 0 0; padding-left: 18px; color: var(--ink-2); font-size: 15px; }
+    .deep .card li { margin: 5px 0; }
+
+    /* stack */
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip { font-size: 14px; padding: 7px 13px; border-radius: 999px; border: 1px solid var(--line); background: var(--card); color: var(--ink-2); }
+
+    /* cta */
+    .cta { text-align: center; padding: 90px 0; }
+    .cta h2 { margin-bottom: 18px; }
+    .cta .ctas { justify-content: center; }
+
+    /* tables, bars */
+    .tbl { width: 100%; border-collapse: collapse; font-size: 15px; background: var(--card); }
+    .tbl th, .tbl td { padding: 12px 16px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+    .tbl th { font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); font-weight: 500; }
+    .tbl td { color: var(--ink-2); }
+    .tbl td b, .tbl .yes { color: var(--ink); font-weight: 500; }
+    .tbl .c { text-align: center; }
+    .tbl .me { background: rgba(255, 122, 26, .08); color: var(--ink); }
+    .tbl-wrap { overflow-x: auto; border-radius: var(--r); border: 1px solid var(--line); }
+    .bars { display: grid; gap: 18px; }
+    .bar-row h4 { margin: 0 0 8px; font-size: 15px; font-weight: 500; }
+    .mbar { display: grid; grid-template-columns: 60px 1fr 70px; align-items: center; gap: 12px; font-size: 13px; color: var(--ink-2); margin: 4px 0; }
+    .mbar i { display: block; height: 12px; border-radius: 6px; background: #3a3a40; }
+    .mbar.after i { background: var(--lime); }
+    .mbar span:last-child { font-family: var(--mono); color: var(--ink); text-align: right; }
+    .two { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr)); gap: 12px; }
+    pre.code { margin: 0; background: #0f0f11; border: 1px solid var(--line); border-radius: 14px; padding: 18px; overflow-x: auto; font: 13px/1.6 var(--mono); color: #cfd2d8; }
+    footer { border-top: 1px solid var(--line); padding: 34px 0 50px; color: var(--ink-3); font-size: 14px; }
+    footer a { color: var(--ink-2); }
+    footer p { margin: 6px 0; }
+  </style>
+</head>
+<body>
+  <header class="bar">
+    <div class="wrap">
+      <a class="brand" href="#top">R.O.N.I.E<span>.</span></a>
+      <nav class="nav">
+        <a href="#what">What he does</a>
+        <a href="#gallery">Gallery</a>
+        <a href="#how">How it works</a>
+        <a href="#template">Template</a>
+        <a href="https://github.com/raunakpatil/ronie-3d-ai-website-agent">GitHub</a>
+      </nav>
+      <a class="btn primary" href="https://raunakpatil.com/ronie" style="padding:8px 16px;font-size:14px">Meet Ronie ↗</a>
+    </div>
+  </header>
+
+  <main id="top">
+    <div class="wrap hero">
+      <div class="kicker">Free to run · any character · plays games · open template</div>
+      <h1>A 3D AI agent<br>for <em>any</em> website.</h1>
+      <p class="lede">Ronie wakes up when you arrive, talks with you in a natural voice, answers questions grounded in
+        real facts, reacts with his face and body, shows you projects, and plays a mind-reading game. All in the
+        browser — for $0 a month.</p>
+      <div class="ctas">
+        <a class="btn primary" href="https://raunakpatil.com/ronie">Talk to Ronie ↗</a>
+        <a class="btn" href="https://github.com/raunakpatil/ronie-3d-ai-website-agent/tree/main/template">Get the template</a>
+        <a class="btn" href="https://github.com/raunakpatil/ronie-3d-ai-website-agent">Read the case study</a>
+        <a class="btn" href="https://raunakpatil.com">See the website</a>
+      </div>
+      <div class="stage">
+        <video src="assets/ronie-wake.mp4" poster="assets/greeting.webp" autoplay muted loop playsinline aria-label="Ronie waking up, leaping into place and waving hello"></video>
+      </div>
+      <p class="caption">Waking him up: the room powers on, he lifts his head, leaps to his spot, waves and starts talking.</p>
+    </div>
+
+    <section>
+      <div class="wrap">
+        <div class="stats">
+          <div class="stat"><b>$0</b><span>a month to run — free tiers only</span></div>
+          <div class="stat"><b>23</b><span>facial expressions on a CRT visor</span></div>
+          <div class="stat"><b>23</b><span>animations authored in Blender, by script</span></div>
+          <div class="stat"><b>7</b><span>models in a self-healing fallback chain</span></div>
+          <div class="stat"><b>2.8 s</b><span>to load his neural voice (was ~45 s)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="free">
+      <div class="wrap">
+        <div class="kicker">100% free to run</div>
+        <h2>$0 a month. Really.</h2>
+        <p class="sub">No subscription, no per-message bill, no per-minute avatar fees. Every part runs on a free tier or in the visitor's own browser, with guard-rails that keep it that way.</p>
+        <div class="tbl-wrap"><table class="tbl">
+          <tr><th>Part</th><th>Where it runs</th><th>Cost</th></tr>
+          <tr><td>Website, 3D scene, chat UI</td><td>Any static host (GitHub Pages)</td><td class="yes">Free</td></tr>
+          <tr><td>AI brain</td><td>Cloudflare Workers free tier</td><td class="yes">Free</td></tr>
+          <tr><td>Language models</td><td>Gemini free tier, then Workers AI's free allowance</td><td class="yes">Free</td></tr>
+          <tr><td>Natural voice</td><td>Kokoro-82M on the visitor's GPU</td><td class="yes">Free, no server</td></tr>
+          <tr><td>Voice on phones, voice input</td><td>The browser's built-in speech</td><td class="yes">Free</td></tr>
+          <tr><td><b>Total</b></td><td></td><td class="yes">$0 / month</td></tr>
+        </table></div>
+      </div>
+    </section>
+
+    <section id="what">
+      <div class="wrap">
+        <div class="kicker">What he does</div>
+        <h2>Not a chat box. A character.</h2>
+        <p class="sub">Most portfolio sites ask visitors to read. Ronie lets them ask — and answers like someone who's
+          actually there.</p>
+        <div class="grid">
+          <div class="card"><span class="tag"><i class="dot" style="background:var(--lime)"></i>Grounded</span><h3>Answers only from real facts</h3><p>Everything he says about me comes from a facts file generated from the site's own content. He can't invent an employer, a date or a number.</p></div>
+          <div class="card"><span class="tag"><i class="dot" style="background:var(--orange)"></i>Expressive</span><h3>Face, icon and move on every reply</h3><p>The model picks a face, a visor icon and a body move for each answer: a nod to agree, a flex for achievements, a bow for thanks, a facepalm for awkward moments.</p></div>
+          <div class="card"><span class="tag"><i class="dot" style="background:var(--cyan)"></i>Voice</span><h3>A neural voice on your own GPU</h3><p>Kokoro-82M runs in a Web Worker on WebGPU — no server, no per-word cost. Phones use their best built-in male voice. You can talk back, too.</p></div>
+          <div class="card"><span class="tag"><i class="dot" style="background:var(--pink)"></i>Actions</span><h3>Shows, links, emails</h3><p>Every place he mentions becomes a button. He holds up project cards. "Email Raunak" opens a ready-written message.</p></div>
+          <div class="card"><span class="tag"><i class="dot" style="background:var(--lime)"></i>Play</span><h3>A mind-reading game</h3><p>Think of anyone or anything. Up to 20 yes/no questions, then a guess — with a photo fetched live from Wikipedia, held up as a polaroid.</p></div>
+          <div class="card"><span class="tag"><i class="dot" style="background:var(--orange)"></i>Safe</span><h3>Can't be talked out of it</h3><p>Jailbreak attempts get an in-character joke and never reach the model. The agent only serves its own site and rate-limits every visitor.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="any">
+      <div class="wrap">
+        <div class="kicker">One agent, any website</div>
+        <h2>Change the facts, and he works anywhere.</h2>
+        <p class="sub">Everything site-specific lives in one config file and one facts file.</p>
+        <div class="grid">
+          <div class="card"><h3>Portfolio</h3><p>Answers recruiters, shows projects, drafts the intro email. The live demo.</p></div>
+          <div class="card"><h3>Online shop</h3><p>Recommends products, answers sizing and delivery, holds up the product.</p></div>
+          <div class="card"><h3>SaaS / app</h3><p>Onboards new users, explains plans, points to the right docs.</p></div>
+          <div class="card"><h3>Restaurant / cafe</h3><p>The menu, opening hours, allergies, then straight to booking.</p></div>
+          <div class="card"><h3>Museum / tourism</h3><p>A host who tells the story of each piece or place, out loud.</p></div>
+          <div class="card"><h3>School / course</h3><p>A tutor that answers only from the course notes, and quizzes you.</p></div>
+          <div class="card"><h3>Events</h3><p>Schedules, speakers, directions: "what's on next?"</p></div>
+          <div class="card"><h3>Brand / game studio</h3><p>A mascot with personality that plays mini-games with fans.</p></div>
+        </div>
+        <div class="two" style="margin-top:46px">
+          <div class="card"><span class="tag"><i class="dot" style="background:var(--orange)"></i>Any character</span><h3>Bring your own 3D model</h3><p>Any rigged glTF character works. Character Creator / ActorCore rigs (like the robot) get everything: eye tracking, the leap, all 23 moves. Other rigs get the idle, head tracking and their own animations, and the moves can be re-made with the included Blender script.</p></div>
+          <div class="card"><span class="tag"><i class="dot" style="background:var(--cyan)"></i>Any world</span><h3>Any picture, or a 3D room</h3><p>Drop in any lit/unlit picture pair and it comes alive with water, embers, mist and stars. Or use the built-in space scene or neon studio, or build your own in three.js. Dozens of voices, and a persona written in plain English.</p></div>
+        </div>
+        <div class="card" style="margin-top:12px"><span class="tag"><i class="dot" style="background:var(--lime)"></i>Games</span><h3>He plays games, and you can add more</h3><p>The mind reader asks up to 20 questions, guesses, and holds up a photo of his answer. It's a reusable pattern (a second prompt, a question budget, tags the page acts on), so a product quiz, riddles, a site-wide scavenger hunt or a "which plan suits you?" questionnaire drop in the same way.</p></div>
+      </div>
+    </section>
+
+    <section id="gallery">
+      <div class="wrap">
+        <div class="kicker">Gallery</div>
+        <h2>From boot to conversation.</h2>
+        <p class="sub">Real screenshots of the live site.</p>
+        <div class="gallery">
+          <figure><img src="assets/loading-sheet.webp" alt="Ronie's spec sheet loading screen" loading="lazy"><figcaption><b>Booting.</b> His spec sheet comes alive with real download progress while his 3D files load.</figcaption></figure>
+          <figure><img src="assets/asleep.webp" alt="Ronie asleep, lit by the cursor" loading="lazy"><figcaption><b>Asleep.</b> The room is dark; your cursor is a small light across his armour.</figcaption></figure>
+          <figure><img src="assets/answer-built.webp" alt="Ronie holding a project card" loading="lazy"><figcaption><b>Showing, not telling.</b> Asked what I've built, he holds a project card out to you.</figcaption></figure>
+          <figure class="tall"><img src="assets/phone.webp" alt="Ronie on a phone" loading="lazy"><figcaption><b>On a phone.</b> His own layout, touch-first.</figcaption></figure>
+          <figure><img src="assets/answer-hire.webp" alt="Ronie answering why to hire Raunak" loading="lazy"><figcaption><b>For recruiters.</b> A grounded answer — and email or LinkedIn one click away.</figcaption></figure>
+          <figure><img src="assets/game-q.webp" alt="The mind-reading game" loading="lazy"><figcaption><b>Mind reader.</b> Yes, no, probably — and then he guesses.</figcaption></figure>
+          <figure><img src="assets/game-start.webp" alt="Ronie with star eyes" loading="lazy"><figcaption><b>23 faces.</b> Star-struck as the game begins.</figcaption></figure>
+          <figure><img src="assets/greeting.webp" alt="Ronie greeting the visitor" loading="lazy"><figcaption><b>Hello.</b> He asks your name and remembers it next time.</figcaption></figure>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <div class="wrap">
+        <div class="kicker">How it works</div>
+        <h2>Three parts, one character.</h2>
+        <p class="sub">A browser front end that is the body and the voice, a tiny serverless agent that is the brain, and
+          free model tiers behind it — each part replaceable.</p>
+        <div class="arch">
+          <div class="node"><h4>In the browser</h4><ul><li>three.js scene: robot, visor shader, bloom, reflections</li><li>Chat UI, voice input, link buttons</li><li>Voice worker: Kokoro-82M on WebGPU</li><li>Service worker: keeps the 325 MB voice in IndexedDB</li></ul></div>
+          <div class="arrow">question →<br>← tags + reply</div>
+          <div class="node"><h4>Cloudflare Worker</h4><ul><li>Persona, rules, facts (generated)</li><li>Injection guard, origin allow-list, rate limit</li><li><code>/pick</code> finds a live model once; <code>/chat</code> sticks with it</li><li>Guessing game + guess detection</li></ul></div>
+          <div class="arrow">generate →<br>← text</div>
+          <div class="node"><h4>Models, free tiers</h4><ul><li>Gemini Flash family — six models, in order</li><li>Workers AI · Qwen3-30B-A3B as the last resort</li><li>Busy or out of quota? Skipped until it's back</li></ul></div>
+        </div>
+
+        <h2 style="font-size:28px;margin-top:56px">One message, end to end</h2>
+        <ol class="flow">
+          <li><b>You ask</b> “Why should we hire him?” — typed, tapped as a chip, or spoken.</li>
+          <li><b>The worker checks it</b> for jailbreak patterns, then sends facts, persona, rules and the conversation to the model it already knows is up.</li>
+          <li><b>The model answers</b> with three tags first: <code>[face:proud] [icon:briefcase] [move:present]</code>, then two or three sentences.</li>
+          <li><b>The page reads the tags</b>: his visor changes, the briefcase icon pops up, and he plays the “present” move.</li>
+          <li><b>He types and speaks</b> the reply, his motion following the beat of his voice.</li>
+          <li><b>Buttons appear</b> for every place he named — email, LinkedIn — and for any project he mentioned.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section>
+      <div class="wrap">
+        <div class="kicker">Under the hood</div>
+        <h2>The engineering details.</h2>
+        <div class="deep">
+          <div class="card"><h3>The body</h3><ul>
+            <li>glTF robot with meshopt geometry and WebP textures (~4 MB)</li>
+            <li>Selective bloom: only true light sources glow</li>
+            <li>Live reflections from a cube camera at his chest</li>
+            <li>Idle pose with procedural breathing, head-tracking and “listening”</li>
+            <li>The cursor is a coloured light across his armour</li></ul></div>
+          <div class="card"><h3>Animation pipeline</h3><ul>
+            <li>23 moves posed by a Python script driving Blender headlessly</li>
+            <li>Inverse kinematics keeps his feet planted when he crouches</li>
+            <li>Finger poses to grip a project card by its corner</li>
+            <li>Every move starts and ends in the idle pose, for seamless blends</li>
+            <li>A second script strips redundant keyframes: −25% download, &lt; 0.06° error</li></ul></div>
+          <div class="card"><h3>The voice</h3><ul>
+            <li>Kokoro-82M (ONNX) in a Web Worker on WebGPU</li>
+            <li>A service worker stores the 325 MB model in IndexedDB: 2.8 s loads, not 45 s</li>
+            <li>Downloaded quietly on landing; nothing on the GPU until he's opened</li>
+            <li>Lines that arrive early wait for the voice, so none go unspoken</li>
+            <li>Device speech fallback with a male-voice picker</li></ul></div>
+          <div class="card"><h3>The room</h3><ul>
+            <li>A neon landscape behind his transparent canvas</li>
+            <li>Glowing and subdued versions aligned with optical flow, cross-faded as a slow “breath”</li>
+            <li>Rippling water, mist, embers, twinkling stars, shooting stars</li>
+            <li>A rim light that traces the moon's real edge</li></ul></div>
+          <div class="card"><h3>Resilience</h3><ul>
+            <li>Adaptive render resolution keeps the frame rate smooth</li>
+            <li>No 3D available, or lost mid-visit? He switches to talk-only and keeps chatting</li>
+            <li>All models down? A scripted menu takes over</li>
+            <li>Phone, tablet and desktop layouts; reduced-motion and keyboard support</li></ul></div>
+          <div class="card"><h3>The brain</h3><ul>
+            <li>Facts generated from the site's content — one command keeps the agent in sync</li>
+            <li>“Awkward but witty” persona with strict, testable rules</li>
+            <li>Trivia answered, then linked back to me only when there's a real connection</li>
+            <li>Never writes links: the page turns named places into buttons</li></ul></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="numbers">
+      <div class="wrap">
+        <div class="kicker">By the numbers</div>
+        <h2>Measured on the live site.</h2>
+        <div class="two">
+          <div class="card bars">
+            <div class="bar-row"><h4>Voice ready after the first visit</h4>
+              <div class="mbar"><span>Before</span><i style="width:100%"></i><span>45 s</span></div>
+              <div class="mbar after"><span>After</span><i style="width:6.2%"></i><span>2.8 s</span></div></div>
+            <div class="bar-row"><h4>Site's first screen download</h4>
+              <div class="mbar"><span>Before</span><i style="width:100%"></i><span>3.5 MB</span></div>
+              <div class="mbar after"><span>After</span><i style="width:15%"></i><span>0.5 MB</span></div></div>
+          </div>
+          <div class="card bars">
+            <div class="bar-row"><h4>Library covers</h4>
+              <div class="mbar"><span>Before</span><i style="width:100%"></i><span>1.1 MB</span></div>
+              <div class="mbar after"><span>After</span><i style="width:43%"></i><span>473 KB</span></div></div>
+            <div class="bar-row"><h4>Animations</h4>
+              <div class="mbar"><span>Before</span><i style="width:100%"></i><span>257 KB</span></div>
+              <div class="mbar after"><span>After</span><i style="width:74%"></i><span>189 KB</span></div></div>
+            <div class="bar-row"><h4>World map data</h4>
+              <div class="mbar"><span>Before</span><i style="width:100%"></i><span>180 KB</span></div>
+              <div class="mbar after"><span>After</span><i style="width:43%"></i><span>78 KB</span></div></div>
+          </div>
+        </div>
+        <h2 style="font-size:28px;margin-top:56px">How it compares</h2>
+        <div class="tbl-wrap"><table class="tbl">
+          <tr><th></th><th class="c">Static About page</th><th class="c">Chat widget</th><th class="c">Video avatar</th><th class="c me">Ronie</th></tr>
+          <tr><td>Answers visitors' own questions</td><td class="c">no</td><td class="c">yes</td><td class="c">yes</td><td class="c me">yes</td></tr>
+          <tr><td>Grounded only in your facts</td><td class="c">yes</td><td class="c">varies</td><td class="c">varies</td><td class="c me">yes</td></tr>
+          <tr><td>A character with a face and body</td><td class="c">no</td><td class="c">no</td><td class="c">video</td><td class="c me">real-time 3D</td></tr>
+          <tr><td>Reacts to what it says</td><td class="c">no</td><td class="c">no</td><td class="c">partly</td><td class="c me">every reply</td></tr>
+          <tr><td>Natural voice</td><td class="c">no</td><td class="c">rarely</td><td class="c">yes</td><td class="c me">on-device</td></tr>
+          <tr><td>Games</td><td class="c">no</td><td class="c">no</td><td class="c">no</td><td class="c me">yes</td></tr>
+          <tr><td>Works without the AI</td><td class="c">yes</td><td class="c">varies</td><td class="c">no</td><td class="c me">scripted</td></tr>
+          <tr><td>Pricing</td><td class="c">free</td><td class="c">usually a subscription</td><td class="c">usually per minute</td><td class="c me">free</td></tr>
+          <tr><td>Your code, your design</td><td class="c">yes</td><td class="c">no</td><td class="c">no</td><td class="c me">yes</td></tr>
+        </table></div>
+      </div>
+    </section>
+
+    <section id="template">
+      <div class="wrap">
+        <div class="kicker">Get the code</div>
+        <h2>The template: Ronie, ready for your site.</h2>
+        <p class="sub">The same code with no personal information: an example owner, one config file, the AI worker, the voice, the game and the Blender tools. No build step, no framework. MIT licensed.</p>
+        <div class="two">
+<pre class="code">template/
+├─ index.html           his room + loading sheet
+├─ ronie.config.js      ← everything about your site
+├─ js/ronie.js          3D, face, moves, chat, voice, game
+├─ js/ronie-page.js     loading, email, start-up
+├─ js/ronie-voice-worker.js
+├─ sw.js                keeps the voice on the device
+├─ models/  img/        character, moves, world
+├─ worker/              the AI brain (Cloudflare)
+└─ tools/               facts · Blender · keyframes</pre>
+<pre class="code"># 1 · run it: he works straight away
+cd template
+python -m http.server 5173
+
+# 2 · make him yours
+#     edit ronie.config.js, then:
+node tools/make-facts.mjs
+
+# 3 · give him a brain (free)
+cd worker &amp;&amp; npx wrangler deploy</pre>
+        </div>
+        <div class="ctas" style="margin-top:22px"><a class="btn primary" href="https://github.com/raunakpatil/ronie-3d-ai-website-agent/tree/main/template">Get the template ↗</a></div>
+      </div>
+    </section>
+
+    <section id="potential">
+      <div class="wrap">
+        <div class="kicker">The potential</div>
+        <h2>Where this goes next.</h2>
+        <div class="grid">
+          <div class="card"><h3>Tools and actions</h3><p>Book a meeting, search the site, add to cart: more tags, more actions.</p></div>
+          <div class="card"><h3>Lip-sync</h3><p>Mouth shapes from the voice's phonemes, not just its beat.</p></div>
+          <div class="card"><h3>Memory</h3><p>Remember a returning visitor's interests, not only their name.</p></div>
+          <div class="card"><h3>Every language</h3><p>Answer in the visitor's own language, in a matching voice.</p></div>
+          <div class="card"><h3>Fully on-device</h3><p>A small language model on WebGPU: private, offline, still free.</p></div>
+          <div class="card"><h3>AR / VR</h3><p>The same scene in WebXR: Ronie standing in your room.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="stack">
+      <div class="wrap">
+        <div class="kicker">Stack</div>
+        <h2>Built with</h2>
+        <div class="chips">
+          <span class="chip">three.js</span><span class="chip">GLSL</span><span class="chip">WebGPU</span><span class="chip">Web Workers</span><span class="chip">Service Worker</span><span class="chip">IndexedDB</span>
+          <span class="chip">Kokoro-82M</span><span class="chip">transformers.js</span><span class="chip">Web Speech API</span><span class="chip">Cloudflare Workers</span><span class="chip">Gemini Flash</span><span class="chip">Workers AI · Qwen3</span>
+          <span class="chip">Blender + Python</span><span class="chip">OpenCV optical flow</span><span class="chip">Vanilla JS, no build step</span><span class="chip">GitHub Pages</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="wrap">
+        <div class="kicker">Your site could have one</div>
+        <h2>Meet him, then let's talk.</h2>
+        <p class="sub" style="margin:0 auto 28px">The same pattern fits a product guide, a museum host, a support assistant or a brand mascot.</p>
+        <div class="ctas">
+          <a class="btn primary" href="https://raunakpatil.com/ronie">Talk to Ronie ↗</a>
+          <a class="btn" href="https://www.linkedin.com/in/raunakpatil/">LinkedIn</a>
+          <a class="btn" href="https://github.com/raunakpatil">GitHub</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap">
+      <p>Built by <a href="https://raunakpatil.com">Raunak Patil</a> — AI Quality Engineer, open to work.</p>
+      <p>Robot model: <a href="https://sketchfab.com/3d-models/sci-fi-ob-robot-unit-th-icc02-animated-6c0764c2bc4c4aaa8e03ba1653f455a6">Sci-Fi O.B. Robot Unit TH-ICC02</a> by <a href="https://sketchfab.com/jungle_jim">Jungle Jim</a>, <a href="http://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>. Voice: <a href="https://huggingface.co/hexgrad/Kokoro-82M">Kokoro-82M</a> by hexgrad (Apache 2.0). Game photos: Wikipedia / Wikimedia Commons.</p>
+      <p>Template code: MIT. Source: <a href="https://github.com/raunakpatil/portfolio">raunakpatil/portfolio</a> · Showcase: <a href="https://github.com/raunakpatil/ronie-3d-ai-website-agent">raunakpatil/ronie-3d-ai-website-agent</a></p>
+    </div>
+  </footer>
+</body>
+</html>

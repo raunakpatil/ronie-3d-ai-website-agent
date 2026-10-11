@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ronie — a 3D AI agent for your website</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 32 32%22%3E%3Ccircle cx=%2216%22 cy=%2216%22 r=%2214%22 fill=%22%23ff7a1a%22/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/ronie.css">
+  <script type="importmap">
+    { "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    } }
+  </script>
+</head>
+<body>
+  <main>
+    <section class="view" data-view="assistant">
+      <div class="rai" id="rai">
+        <div class="rai-bg" id="rai-bg-wrap" aria-hidden="true">
+          <img id="rai-bg" src="img/ronie-bg.webp?v=2" alt="" decoding="async">
+          <img id="rai-bg-lit" src="img/ronie-bg-lit.webp?v=1" alt="" decoding="async">
+        </div>
+        <canvas class="rai-bgfx" id="rai-bgfx" aria-hidden="true"></canvas>
+        <canvas class="rai-canvas" id="rai-canvas" aria-hidden="true"></canvas>
+        <div class="rai-loading" id="rai-loading" aria-live="polite">
+          <!-- while he loads: his spec sheet. The boot % is live (#rai-load-pct), the rest animates in main.js -->
+          <div class="sp" id="rai-spec">
+            <header class="sp-box sp-title">
+              <h2>R.O.N.I.E. <span>// Unit 01</span></h2>
+              <p data-tagline>Your website's own AI agent</p>
+              <i class="sp-line" aria-hidden="true"><b id="sp-line"></b></i>
+            </header>
+            <section class="sp-box sp-top" aria-label="System specs">
+              <dl class="sp-kv">
+                <dt class="sp-h">System specs</dt><dd></dd>
+                <dt>Sync</dt><dd id="sp-sync">96.0%</dd>
+                <dt>Boot</dt><dd><b id="sp-boot">0%</b><b id="rai-load-pct" hidden>0%</b></dd>
+                <dt>Core</dt><dd id="sp-core" class="sp-core">▯▯▯▯▯▯▯</dd>
+                <dt>Mode</dt><dd id="sp-mode">Booting</dd>
+                <dt class="sp-cmd" id="sp-log">› initialising</dt>
+              </dl>
+              <dl class="sp-kv sp-model">
+                <dt class="sp-h">Model</dt><dd></dd>
+                <dt>R.O.N.I.E.</dt><dd>(Unit 01)</dd>
+                <dt>Type</dt><dd>: Humanoid AI</dd>
+                <dt>Height</dt><dd>: 180 cm (approx.)</dd>
+                <dt>Weight</dt><dd>: 120 kg (approx.)</dd>
+              </dl>
+              <div class="sp-id">
+                <p class="sp-owner"><i aria-hidden="true"></i><span data-owner>Your Name</span></p>
+                <canvas class="sp-wave" id="sp-wave" aria-hidden="true"></canvas>
+                <p class="sp-motto">Same mind.<br>New body.<br>More possibilities.</p>
+              </div>
+            </section>
+            <section class="sp-box sp-ortho" aria-label="Orthographic views"><h3>Orthographic views</h3>
+              <div class="sp-views">
+                <span class="sp-height" aria-hidden="true"><b>180 cm</b><small>total height</small></span>
+                <figure><img src="img/ronie-spec/ortho-front.webp?v=2" alt="Ronie from the front" decoding="async"><span class="sp-dim">≈ 85 cm</span><figcaption>Front view</figcaption></figure>
+                <figure><img src="img/ronie-spec/ortho-side.webp?v=2" alt="Ronie from the side" decoding="async"><span class="sp-dim">≈ 60 cm</span><figcaption>Side view</figcaption></figure>
+                <figure><img src="img/ronie-spec/ortho-back.webp?v=2" alt="Ronie from the back" decoding="async"><span class="sp-dim">≈ 85 cm</span><figcaption>Back view</figcaption></figure>
+              </div>
+            </section>
+            <section class="sp-box sp-details" aria-label="Details"><h3>Details</h3><div class="sp-tiles"><figure><span class="sp-ph"><img src="img/ronie-spec/d-helmet.webp?v=2" alt="" decoding="async"></span><figcaption>Helmet detail<small>Visor (HUD display)<br>Neural interface</small></figcaption></figure><figure><span class="sp-ph"><img src="img/ronie-spec/d-chest.webp?v=2" alt="" decoding="async"></span><figcaption>Chest plate<small>Core housing<br>Cooling vents</small></figcaption></figure><figure><span class="sp-ph"><img src="img/ronie-spec/d-shoulder.webp?v=2" alt="" decoding="async"></span><figcaption>Shoulder armor<small>Layered plating<br>Flex joints</small></figcaption></figure><figure><span class="sp-ph"><img src="img/ronie-spec/d-forearm.webp?v=2" alt="" decoding="async"></span><figcaption>Forearm detail<small>Segmented armor<br>Hydraulic lines</small></figcaption></figure><figure><span class="sp-ph"><img src="img/ronie-spec/d-back.webp?v=2" alt="" decoding="async"></span><figcaption>Back core<small>Power unit<br>Heat dissipation</small></figcaption></figure><figure><span class="sp-ph"><img src="img/ronie-spec/d-boot.webp?v=2" alt="" decoding="async"></span><figcaption>Boot detail<small>Grip sole<br>Stability frame</small></figcaption></figure></div></section>
+            <section class="sp-box sp-palette" aria-label="Colour palette"><h3>Colour palette</h3>
+              <ul>
+                <li><i style="--c:#e67e22"></i><span>Orange<br><small>#E67E22 · armor</small></span></li>
+                <li><i style="--c:#1b1b1b"></i><span>Black<br><small>#1B1B1B · matte</small></span></li>
+                <li><i style="--c:#c0c6cc"></i><span>Silver<br><small>#C0C6CC · metal</small></span></li>
+                <li><i style="--c:#3a3a3a"></i><span>Dark grey<br><small>#3A3A3A · joints</small></span></li>
+              </ul>
+            </section>
+            <section class="sp-box sp-joints" aria-label="Joint layout"><h3>Joint layout</h3><svg class="sp-jsvg" viewBox="0 0 610 750" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><image href="img/ronie-spec/joints.webp?v=2" width="450" height="750"/><g><circle cx="324" cy="214" r="7"/><path d="M332 214 L468 214 L484 214"/><text x="492" y="210">Shoulder</text><text x="492" y="234">joint</text></g><g><circle cx="369" cy="285" r="7"/><path d="M377 285 L468 285 L484 285"/><text x="492" y="281">Elbow</text><text x="492" y="305">joint</text></g><g><circle cx="273" cy="363" r="7"/><path d="M281 363 L468 363 L484 363"/><text x="492" y="359">Hip</text><text x="492" y="383">joint</text></g><g><circle cx="305" cy="497" r="7"/><path d="M313 497 L468 497 L484 497"/><text x="492" y="493">Knee</text><text x="492" y="517">joint</text></g><g><circle cx="286" cy="646" r="7"/><path d="M294 646 L468 646 L484 646"/><text x="492" y="642">Ankle</text><text x="492" y="666">joint</text></g></svg></section>
+            <section class="sp-box sp-armor" aria-label="Armor components"><h3>Armor components</h3><div class="sp-strip"><figure><img src="img/ronie-spec/a-helmet.webp?v=2" alt="" decoding="async"><figcaption>Helmet</figcaption></figure><figure><img src="img/ronie-spec/a-shoulder.webp?v=2" alt="" decoding="async"><figcaption>Shoulder armor</figcaption></figure><figure><img src="img/ronie-spec/a-chest.webp?v=2" alt="" decoding="async"><figcaption>Chest plate</figcaption></figure><figure><img src="img/ronie-spec/a-forearm.webp?v=2" alt="" decoding="async"><figcaption>Forearm armor</figcaption></figure><figure><img src="img/ronie-spec/a-thigh.webp?v=2" alt="" decoding="async"><figcaption>Thigh armor</figcaption></figure><figure><img src="img/ronie-spec/a-knee.webp?v=2" alt="" decoding="async"><figcaption>Knee guard</figcaption></figure><figure><img src="img/ronie-spec/a-boot.webp?v=2" alt="" decoding="async"><figcaption>Boot</figcaption></figure></div></section>
+            <section class="sp-box sp-meas" aria-label="Key measurements">
+              <h3>Key measurements</h3>
+              <dl class="sp-kv"><dt>Total height</dt><dd>: 180 cm</dd><dt>Shoulder width</dt><dd>: 85 cm</dd><dt>Body depth</dt><dd>: 60 cm</dd><dt>Weight (approx.)</dt><dd>: 120 kg</dd></dl>
+              <h3>Materials</h3>
+              <ul class="sp-list"><li>Carbon fiber composite</li><li>Aluminium alloy</li><li>Titanium alloy</li><li>High strength polymer</li></ul>
+            </section>
+            <section class="sp-box sp-notes" aria-label="Notes">
+              <h3>Notes</h3>
+              <ul class="sp-list"><li>Compact humanoid design</li><li>Optimised for mobility &amp; stability</li><li>Modular armor plates</li><li>Advanced sensor suite</li><li>Designed for multi-environment operations</li></ul>
+              <p class="sp-sign"><span data-agent>Ronie</span> <span>/</span> AI agent</p>
+              <svg class="sp-globe" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="28"/><ellipse cx="32" cy="32" rx="12" ry="28"/><ellipse cx="32" cy="32" rx="22" ry="28"/><path d="M4 32h56M8 18h48M8 46h48"/></svg>
+            </section>
+            <footer class="sp-box sp-foot">
+              <span class="sp-foot-name">R.O.N.I.E. // Unit 01</span>
+              <canvas class="sp-wave" id="sp-wave2" aria-hidden="true"></canvas>
+              <span class="sp-foot-log" id="sp-foot-log">// booting<br>// 000 boot<br>// standby</span>
+              <canvas class="sp-spectrum" id="sp-spectrum" aria-hidden="true"></canvas>
+              <span class="sp-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            </footer>
+          </div>
+        </div>
+        <button class="rai-wake" id="rai-wake" type="button" hidden><span>WAKE RONIE</span></button>
+        <div class="rai-panel" id="rai-panel" hidden>
+          <div class="rai-head">
+            <span class="rai-tag" id="rai-tag"><i aria-hidden="true"></i>R.O.N.I.E <span id="rai-status">online</span></span>
+            <button class="rai-back" id="rai-back" type="button" hidden>← Back</button>
+          </div>
+          <p class="rai-say" id="rai-say" aria-live="polite"></p>
+          <form class="rai-actions" id="rai-actions" novalidate></form>
+        </div>
+        <div class="rai-progress" aria-hidden="true"><i id="rai-progress"></i></div>
+        <a class="rai-close" href="#dashboard" aria-label="Close and go back to the dashboard">&times;</a>
+        <button class="rai-sound" id="rai-sound" type="button" aria-pressed="false" aria-label="Typing sounds">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z"/><path class="rai-wave" d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12"/><path class="rai-x" d="m16 9 6 6m0-6-6 6"/></svg>
+        </button>
+      </div>
+    </section>
+  </main>
+  <script src="ronie.config.js"></script>
+  <script type="module" src="js/ronie-page.js"></script>
+</body>
+</html>
