@@ -418,8 +418,8 @@ Ronie is a foundation. Natural next steps, all in reach of the same architecture
 | Front end | Vanilla JavaScript (ES modules), CSS — no framework, no build step |
 | Hosting | GitHub Pages (site) · Cloudflare (agent) |
 
-The live version runs inside my portfolio ([raunakpatil/portfolio](https://github.com/raunakpatil/portfolio)); the
-[`template/`](template/) here is the same code, de-personalised and standalone.
+The live version runs inside my portfolio at [raunakpatil.com](https://raunakpatil.com); the [`template/`](template/) here is
+the same agent, de-personalised and standalone.
 
 ---
 
